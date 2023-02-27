@@ -2,55 +2,95 @@
   <ion-page>
     <ion-header :translucent="true">
       <ion-toolbar>
-        <ion-title>Blank</ion-title>
+        <ion-title>Color Picker Demo</ion-title>
       </ion-toolbar>
     </ion-header>
 
     <ion-content :fullscreen="true">
-      <ion-header collapse="condense">
-        <ion-toolbar>
-          <ion-title size="large">Blank</ion-title>
-        </ion-toolbar>
-      </ion-header>
-
-      <div id="container">
-        <strong>Ready to create an app?</strong>
-        <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
-      </div>
+      <ion-card class="">
+        <ion-card-header>
+          <ion-title>
+            Pick a Color
+          </ion-title>
+        </ion-card-header>
+        <ion-card-content class="ion-text-center ion-margin">
+          <div>
+          <input type="color" v-model="selectedColour" @input="setColor" />
+        </div>
+      </ion-card-content>
+      </ion-card>
+      <ion-card>
+        <ion-card-header>
+          <ion-title>
+            Preview
+          </ion-title>
+          </ion-card-header>
+          <ion-card-content class="ion-margin">
+            <div :style="{ backgroundColor: selectedColour }" class="color-box"></div>
+          </ion-card-content>
+      </ion-card>
+      <ion-card>
+        <ion-card-header>
+          <ion-title>
+            HEX Code
+          </ion-title>
+        </ion-card-header>
+        <ion-card-content class="ion-margin">
+          <ion-item lines="none">
+            <ion-label>
+                {{ selectedColour }}
+            </ion-label>
+            <ion-button color="light" slot="end" @click="copyHex">
+              <ion-icon :icon="copyOutline" slot="start"></ion-icon>
+              Copy
+            </ion-button>
+          </ion-item>
+        </ion-card-content>
+      </ion-card>
     </ion-content>
   </ion-page>
 </template>
 
 <script setup lang="ts">
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
+import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, toastController  } from '@ionic/vue';
+import { IonIcon } from '@ionic/vue';
+  import { copyOutline } from 'ionicons/icons';
 </script>
 
-<style scoped>
-#container {
-  text-align: center;
-  
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
+<script lang="ts">
+export default {
+  data() {
+    return {
+      selectedColour: "#000000",
+    };
+  },
+  methods: {
+    setColor() {
+      this.$emit("updateColor", this.selectedColour);
+    },
+    async copyHex() {
+      const text = this.selectedColour;
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand("copy");
+  document.body.removeChild(textarea);
+  const toast = await toastController.create({
+          message: 'Copied to clipboard!',
+          duration: 1500,
+          position: 'top'
+        });
+        await toast.present();
 }
+  },
+};
+</script>
 
-#container strong {
-  font-size: 20px;
-  line-height: 26px;
-}
-
-#container p {
-  font-size: 16px;
-  line-height: 22px;
-  
-  color: #8c8c8c;
-  
-  margin: 0;
-}
-
-#container a {
-  text-decoration: none;
+<style>
+.color-box {
+  width: 100%;
+  height: 50px;
+  margin-top: 10px;
 }
 </style>
