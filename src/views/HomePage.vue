@@ -9,17 +9,15 @@
     <ion-content :fullscreen="true">
       <ion-card class="">
         <ion-card-header>
-          <ion-title> Pick a Color </ion-title>
+          <ion-title>Pick a Color</ion-title>
         </ion-card-header>
         <ion-card-content class="ion-text-center ion-margin">
-          <div>
-            <input type="color" v-model="selectedColour" @input="setColor" />
-          </div>
+          <color-picker @input="onInput"></color-picker>
         </ion-card-content>
       </ion-card>
       <ion-card>
         <ion-card-header>
-          <ion-title> Preview </ion-title>
+          <ion-title>Preview</ion-title>
         </ion-card-header>
         <ion-card-content class="ion-margin">
           <div
@@ -29,7 +27,7 @@
       </ion-card>
       <ion-card>
         <ion-card-header>
-          <ion-title> HEX Code </ion-title>
+          <ion-title>HEX Code</ion-title>
         </ion-card-header>
         <ion-card-content class="ion-margin">
           <ion-item lines="none">
@@ -58,16 +56,57 @@
   } from "@ionic/vue";
   import { IonIcon } from "@ionic/vue";
   import { copyOutline } from "ionicons/icons";
+  import { reactive } from "vue";
+  import ColorPicker from "@radial-color-picker/vue-color-picker";
 
   export default {
+    components: { ColorPicker },
+    setup() {
+      const color = reactive({
+        hue: 50,
+        saturation: 100,
+        luminosity: 50,
+        alpha: 1,
+      });
+    },
     data() {
       return {
         selectedColour: "#000000",
       };
     },
+    mounted() {
+      console.log("hello");
+    },
     methods: {
-      setColor() {
-        this.$emit("updateColor", this.selectedColour);
+      onInput(hue) {
+        this.selectedColour = this.hueToHex(hue);
+      },
+      hueToHex(hue) {
+        const huePrime = hue / 60;
+        const c = 1;
+        const x = 1 - Math.abs((huePrime % 2) - 1);
+        let rgb;
+
+        if (huePrime >= 0 && huePrime <= 1) {
+          rgb = [c, x, 0];
+        } else if (huePrime > 1 && huePrime <= 2) {
+          rgb = [x, c, 0];
+        } else if (huePrime > 2 && huePrime <= 3) {
+          rgb = [0, c, x];
+        } else if (huePrime > 3 && huePrime <= 4) {
+          rgb = [0, x, c];
+        } else if (huePrime > 4 && huePrime <= 5) {
+          rgb = [x, 0, c];
+        } else if (huePrime > 5 && huePrime <= 6) {
+          rgb = [c, 0, x];
+        }
+
+        const [r, g, b] = rgb.map((value) => {
+          const v = Math.round(value * 255);
+          return v.toString(16).padStart(2, "0");
+        });
+
+        return `#${r}${g}${b}`;
       },
       async copyHex() {
         const text = this.selectedColour;
@@ -89,6 +128,7 @@
 </script>
 
 <style>
+  @import "@radial-color-picker/vue-color-picker/dist/vue-color-picker.min.css";
   .color-box {
     width: 100%;
     height: 50px;
