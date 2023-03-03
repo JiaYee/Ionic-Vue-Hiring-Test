@@ -35,7 +35,7 @@
               {{ selectedColour }}
             </ion-label>
             <ion-button color="light" slot="end" @click="copyHex">
-              <ion-icon :icon="copyOutline" slot="start"></ion-icon>
+              <ion-icon :icon="copyOutlineIcon" slot="start"></ion-icon>
               Copy
             </ion-button>
           </ion-item>
@@ -72,6 +72,7 @@
     data() {
       return {
         selectedColour: "#000000",
+        copyOutlineIcon: copyOutline, // Import the copyOutline icon and use it in the template
       };
     },
     mounted() {
